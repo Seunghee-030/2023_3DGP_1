@@ -117,7 +117,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -142,9 +142,6 @@
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="Shader.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
@@ -157,9 +154,6 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Scene.h" />
-    <ClInclude Include="Shader.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>

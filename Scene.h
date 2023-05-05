@@ -25,11 +25,13 @@ private:
 #endif
 
 public:
+	bool GameOver = false;
 	virtual void BuildObjects();
 	virtual void ReleaseObjects();
 
 	void CheckObjectByObjectCollisions();
 	void CheckObjectByBulletCollisions();
+	void CheckObjectByTankCollisions();
 	void CheckTankByBulletCollisions();
 
 	virtual void Animate(float fElapsedTime);
@@ -39,5 +41,23 @@ public:
 	virtual void OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 
 	CGameObject* PickObjectPointedByCursor(int xClient, int yClient, CCamera* pCamera);
+
+	/* 따라하기 7번 */
+
+	void ReleaseUploadBuffers();
+	void FollwPlayer();
+	//그래픽 루트 시그너쳐를 생성한다. 
+	ID3D12RootSignature* CreateGraphicsRootSignature(ID3D12Device* pd3dDevice);
+	ID3D12RootSignature* GetGraphicsRootSignature();
+
+protected:
+
+	ID3D12RootSignature* m_pd3dGraphicsRootSignature = NULL;
+
+protected:
+	CHeightMapTerrain* m_pTerrain = NULL;
+
+public:
+	CHeightMapTerrain* GetTerrain() { return(m_pTerrain); }
 };
 

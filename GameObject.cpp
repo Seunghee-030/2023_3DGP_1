@@ -379,6 +379,7 @@ void CBulletObject::Animate(float fElapsedTime)
 	float fDistance = m_fMovingSpeed * fElapsedTime;
 
 	XMFLOAT3 xmf3Position = GetPosition();
+
 	if ((m_fElapsedTimeAfterFire > m_fLockingDelayTime) && m_pLockedObject)
 	{
 		XMVECTOR xmvPosition = XMLoadFloat3(&xmf3Position);

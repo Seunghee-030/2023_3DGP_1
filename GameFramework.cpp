@@ -16,7 +16,7 @@ void CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 
 	BuildObjects();
 
-	_tcscpy_s(m_pszFrameRate, _T("LabProject ("));
+	_tcscpy_s(m_pszFrameRate, _T("2020184025 ("));
 }
 
 void CGameFramework::OnDestroy()
@@ -61,40 +61,41 @@ void CGameFramework::PresentFrameBuffer()
 	::ReleaseDC(m_hWnd, hDC);
 }
 
+//렌더링할 객체를 생성하는 함수
 void CGameFramework::BuildObjects()
 {
-	m_pCamera = new CCamera();
 
-	m_pCamera->SetViewport(0, 0, FRAMEBUFFER_WIDTH, FRAMEBUFFER_HEIGHT);
-	m_pCamera->GeneratePerspectiveProjectionMatrix(1.01f, 500.0f, 60.0f);
-	m_pCamera->SetFOVAngle(60.0f);
-	//m_pCamera->GenerateOrthographicProjectionMatrix(1.01f, 50.0f, FRAMEBUFFER_WIDTH, FRAMEBUFFER_HEIGHT);
+	CCamera* pCamera = new CCamera();
+	CCamera* pCamera2 = new CCamera();
+	pCamera->SetViewport(0, 0, FRAMEBUFFER_WIDTH, FRAMEBUFFER_HEIGHT);
+	pCamera->GeneratePerspectiveProjectionMatrix(1.01f, 500.0f, 60.0f);
+	pCamera->SetFOVAngle(60.0f);
+
+	pCamera->GenerateOrthographicProjectionMatrix(1.01f, 50.0f, FRAMEBUFFER_WIDTH, FRAMEBUFFER_HEIGHT);
+
+	pCamera2->SetViewport(0, 0, FRAMEBUFFER_WIDTH, FRAMEBUFFER_HEIGHT);
+	pCamera2->GeneratePerspectiveProjectionMatrix(1.01f, 500.0f, 60.0f);
+	pCamera2->SetFOVAngle(60.0f);
+
+	pCamera2->GenerateOrthographicProjectionMatrix(1.01f, 50.0f, FRAMEBUFFER_WIDTH, FRAMEBUFFER_HEIGHT);
 
 	m_pPlayer = new CTankPlayer();
-	m_pPlayer->SetPosition(0.0f, 1.0f, -40.0f);
-	m_pPlayer->SetCamera(m_pCamera);
-	m_pPlayer->SetCameraOffset(XMFLOAT3(100.0f, 70.0f, 0.0f));
+	m_pPlayer->SetPosition(0.0f, 1.0f, -50.0f);
+	m_pPlayer->SetCamera(pCamera);
+	m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 10.0f, -20.0f));
 	m_pPlayer->LookAt(XMFLOAT3(0.0f, 0.0f, 0.0f), m_pPlayer->GetUp());
 
-	/*m_pCamera2 = new CCamera();
-	m_pCamera2->SetViewport(0, 0, FRAMEBUFFER_WIDTH, FRAMEBUFFER_HEIGHT);
-	m_pCamera2->GeneratePerspectiveProjectionMatrix(1.01f, 500.0f, 60.0f);
-	m_pCamera2->SetFOVAngle(60.0f);
-	m_pCamera2->GenerateOrthographicProjectionMatrix(1.01f, 50.0f, FRAMEBUFFER_WIDTH, FRAMEBUFFER_HEIGHT);*/
-
 	m_pPlayer2 = new CTankPlayer();
-	m_pPlayer2->SetPosition(0.0f, 1.0f, 40.0f);
-	//m_pPlayer2->SetCamera(m_pCamera);
-	m_pPlayer2->LookAt(XMFLOAT3(0.0f, 0.0f, 0.0f), m_pPlayer2->GetUp());
+	m_pPlayer2->SetPosition(0.0f, 1.0f, 20.0f);
+	m_pPlayer2->SetCamera(pCamera2);
+	m_pPlayer2->SetCameraOffset(XMFLOAT3(0.0f, 10.0f, 10.0f));
+	m_pPlayer2->LookAt(XMFLOAT3(0.0f, 1.0f, 0.0f), m_pPlayer2->GetUp());
 
-
-	m_pPlayer->playTurn = true;
-	m_pPlayer2->playTurn = false;
-
+	m_pPlayer2->playTurn = true;
+	m_pPlayer2->MoveStrafe(10);
 	m_pScene = new CScene(m_pPlayer, m_pPlayer2);
+	m_pLockedObject = m_pScene->PickObjectPointedByCursor(LOWORD(1), HIWORD(1), m_pPlayer->m_pCamera);
 	m_pScene->BuildObjects();
-	//m_pScene2 = new CScene(m_pPlayer);
-	//m_pScene2->BuildObjects();
 }
 
 // 렌더링할 객체를 소멸시키는 함수
@@ -106,8 +107,8 @@ void CGameFramework::ReleaseObjects()
 		delete m_pScene;
 	}
 
-	//if (m_pPlayer) delete m_pPlayer;
-	//if (m_pPlayer2) delete m_pPlayer2;
+	if (m_pPlayer) delete m_pPlayer;
+	if (m_pPlayer2) delete m_pPlayer2;
 }
 
 void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
@@ -118,7 +119,7 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 	{
 	case WM_RBUTTONDOWN:
 	case WM_LBUTTONDOWN:
-		//::SetCapture(hWnd);
+		::SetCapture(hWnd);
 		::GetCursorPos(&m_ptOldCursorPos);
 		// 오른 쪽 버튼
 		if (nMessageID == WM_RBUTTONDOWN)
@@ -167,38 +168,49 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 		case 'E':
 			((CTankPlayer*)m_pPlayer)->RotateGun(-1.0f);
 			break;
-			// 탱크 객체 2
-		case 'L': //상
-			((CTankPlayer*)m_pPlayer2)->RotateTurret(+5.0f);
-			break;
-		case 'J': //하
-			((CTankPlayer*)m_pPlayer2)->RotateTurret(-5.0f);
-			break;
-		case 'K': //좌
-			((CTankPlayer*)m_pPlayer2)->RotateGun(+1.0f);
-			break;
-		case 'I': //우
-			((CTankPlayer*)m_pPlayer2)->RotateGun(-1.0f);
-			break;
 		case 'N':
-			((CTankPlayer*)m_pPlayer2)->SetColor(RGB(0, 0, 0));
-
-			if (((CTankPlayer*)m_pPlayer)->playTurn) {
-				((CTankPlayer*)m_pPlayer)->playTurn = false;
-				((CTankPlayer*)m_pPlayer2)->playTurn = true;
+			//토글 뷰 변환
+			if (togleView) {
+				togleView = false;
+				m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 10.0f, -20.0f));
 			}
-			else if (((CTankPlayer*)m_pPlayer2)->playTurn) {
-				((CTankPlayer*)m_pPlayer)->playTurn = true;
-				((CTankPlayer*)m_pPlayer2)->playTurn = false;
+			else{
+				togleView = true;
+				m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 50.0f,-1.0f));
 			}
+			break;
+			//	// 탱크 객체 2
+			//case 'L': //상
+			//	((CTankPlayer*)m_pPlayer2)->RotateTurret(+5.0f);
+			//	break;
+			//case 'J': //하
+			//	((CTankPlayer*)m_pPlayer2)->RotateTurret(-5.0f);
+			//	break;
+			//case 'K': //좌
+			//	((CTankPlayer*)m_pPlayer2)->RotateGun(+1.0f);
+			//	break;
+			//case 'I': //우
+			//	((CTankPlayer*)m_pPlayer2)->RotateGun(-1.0f);
+				//break;
+			// 게임 타이머 다시 가동
+		case 'R':
+			BuildObjects();
+			m_pScene->GameOver = false;
+			m_GameTimer.Start();
+			m_pPlayer2->HP = 10;
+			m_pPlayer->HP = 10;
 			break;
 		case VK_CONTROL:
-			((CTankPlayer*)m_pPlayer)->FireBullet(m_pLockedObject);
-			m_pLockedObject = NULL;
+			if (!m_pScene->GameOver) {
+				((CTankPlayer*)m_pPlayer)->FireBullet(m_pLockedObject2);
+				//m_pLockedObject = NULL;
+			}
 			break;
 		case 'O':
-			((CTankPlayer*)m_pPlayer2)->FireBullet(m_pLockedObject2);
-			m_pLockedObject2 = NULL;
+			if (!m_pScene->GameOver) {
+				((CTankPlayer*)m_pPlayer2)->FireBullet(m_pLockedObject);
+				m_pLockedObject2 = NULL;
+			}
 			break;
 		case VK_F1:
 		case VK_F2:
@@ -251,7 +263,7 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 void CGameFramework::ProcessInput()
 {
 	static UCHAR pKeyBuffer[256];
-	if (GetKeyboardState(pKeyBuffer) && ((CTankPlayer*)m_pPlayer)->playTurn == true)
+	if (GetKeyboardState(pKeyBuffer) && !m_pScene->GameOver)
 	{
 		DWORD dwDirection = 0;
 		if (pKeyBuffer[VK_UP] & 0xF0) dwDirection |= DIR_FORWARD;		// ‘↑’
@@ -261,20 +273,10 @@ void CGameFramework::ProcessInput()
 		if (pKeyBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;			// 'page up'
 		if (pKeyBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;		// 'page down'
 
-		if (dwDirection) m_pPlayer->Move(dwDirection, 0.15f);
-	}
-
-	else
-	{
-		DWORD dwDirection = 0;
-		if (pKeyBuffer[VK_UP] & 0xF0) dwDirection |= DIR_FORWARD;
-		if (pKeyBuffer[VK_DOWN] & 0xF0) dwDirection |= DIR_BACKWARD;
-		if (pKeyBuffer[VK_LEFT] & 0xF0) dwDirection |= DIR_LEFT;
-		if (pKeyBuffer[VK_RIGHT] & 0xF0) dwDirection |= DIR_RIGHT;
-		if (pKeyBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
-		if (pKeyBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
-
-		if (dwDirection) m_pPlayer2->Move(dwDirection, 0.15f);
+		if (dwDirection) {
+			m_pPlayer->Move(dwDirection, 0.2f);
+			//m_pPlayer2->Move(dwDirection, 0.25f);
+		}
 	}
 
 	// 마우스 또는 키 입력이 있으면 플레이어를 이동 or 회전
@@ -307,6 +309,7 @@ void CGameFramework::ProcessInput()
 	// 플레이어를 실제로 이동하고 카메라 갱신
 	// 중력과 마찰력의 영향을 속도 벡터에 적용
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
+	m_pPlayer2->Update(m_GameTimer.GetTimeElapsed());
 
 }
 
@@ -314,11 +317,11 @@ void CGameFramework::ProcessInput()
 void CGameFramework::AnimateObjects()
 {
 	float fTimeElapsed = m_GameTimer.GetTimeElapsed();
-	if (m_pPlayer) m_pPlayer->Animate(fTimeElapsed);
-	if (m_pPlayer2) m_pPlayer2->Animate(fTimeElapsed);
-	if (m_pScene) m_pScene->Animate(fTimeElapsed);
 
-	//if (m_pScene2) m_pScene2->Animate(fTimeElapsed);
+	if (m_pPlayer && !m_pScene->GameOver) m_pPlayer->Animate(fTimeElapsed);
+	if (m_pPlayer2 && !m_pScene->GameOver) m_pPlayer2->Animate(fTimeElapsed);
+	if (m_pScene && !m_pScene->GameOver) m_pScene->Animate(fTimeElapsed);
+	((CTankPlayer*)m_pPlayer2)->FireBullet(m_pLockedObject);
 }
 
 // 오브젝트들을 렌더링 해주는 함수
@@ -332,11 +335,12 @@ void CGameFramework::FrameAdvance()
 
 	// 배경 색 클리어
 	//ClearFrameBuffer(RGB(210, 255, 255));
-	ClearFrameBuffer(RGB(150, 155, 155));
+	ClearFrameBuffer(RGB(150, 150, 150));
 
 	m_pCamera = m_pPlayer->GetCamera();
 	if (m_pScene) m_pScene->Render(m_hDCFrameBuffer, m_pCamera);
-
+	if (m_pScene->GameOver)
+		m_GameTimer.Stop();
 	PresentFrameBuffer();
 
 	m_GameTimer.GetFrameRate(m_pszFrameRate + 12, 37);

@@ -40,6 +40,19 @@ CMesh::~CMesh()
 	}
 }
 
+void CMesh::ReleaseUploadBuffers() {
+
+	//정점 버퍼를 위한 업로드 버퍼를 소멸시킨다. 
+	if (m_pd3dVertexUploadBuffer)
+		m_pd3dVertexUploadBuffer->Release();
+	m_pd3dVertexUploadBuffer = NULL;
+
+	if (m_pd3dIndexUploadBuffer)
+		m_pd3dIndexUploadBuffer->Release();
+	m_pd3dIndexUploadBuffer = NULL;
+
+};
+
 void CMesh::SetPolygon(int nIndex, CPolygon *pPolygon)
 {
 	if ((0 <= nIndex) && (nIndex < m_nPolygons)) m_ppPolygons[nIndex] = pPolygon;

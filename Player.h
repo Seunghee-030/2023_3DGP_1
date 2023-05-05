@@ -41,8 +41,9 @@ public:
 	//카메라의 위치가 바뀔 때마다 호출되는OnCameraUpdateCallback() 함수에서 사용하는 데이터이다. 
 	LPVOID m_pCameraUpdatedContext;
 
-	// 플레이 턴 true = player1,  false = player2
-	bool playTurn = true;
+	// 플레이 턴 true = player2
+	bool playTurn = false;
+	int HP = 10;
 
 public:
 	void SetPosition(float x, float y, float z);
@@ -101,17 +102,15 @@ public:
 	CCamera* OnChangeCamera(DWORD nNewCameraMode, DWORD nCurrentCameraMode);
 	virtual CCamera* ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed) { return(NULL); }
 
-	//플레이어의 위치와 회전축으로부터 월드 변환 행렬을 생성하는 함수이다.
-	//virtual void OnPrepareRender();
 
-	//플레이어의 카메라가 3인칭 카메라일 때 플레이어(메쉬)를 렌더링한다. 
-	//virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
-
+	XMFLOAT3& GetRightVector() { return(m_xmf3Right); }
+	XMFLOAT3& GetUpVector() { return(m_xmf3Up); }
+	XMFLOAT3& GetLookVector() { return(m_xmf3Look); }
 
 
 };
 
-#define BULLETS					50
+#define BULLETS					5
 
 class CAirplanePlayer : public CPlayer
 {
